@@ -1,16 +1,42 @@
-/* 
-    define object that takes url as parameter and 
-    returns Promise with the response for the get and post requests made
-    the object should have 2 properties 
-    - get
-    - post
-
-    the properties should return Promise that should resolve 
-    for success or reject with error
-
-*/
 function http(url){
-
+    this.url = url;
+    return {
+        get: function(){
+            return new Promise(function(resolve, reject){
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url);
+                xhr.onload = function(){
+                    if(xhr.status === 200){
+                        resolve(xhr.response);
+                    }else{
+                        reject(xhr.statusText);
+                    }
+                }
+                xhr.onerror = function(){
+                    reject(xhr.statusText);
+                }
+                xhr.send();
+            });
+        },
+        post: function(data){
+            return new Promise(function(resolve, reject){
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', url);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = function(){
+                    if(xhr.status === 200){
+                        resolve(xhr.response);
+                    }else{
+                        reject(xhr.statusText);
+                    }
+                }
+                xhr.onerror = function(){
+                    reject(xhr.statusText);
+                }
+                xhr.send(JSON.stringify(data));
+            });
+        }
+    }
 }
 
 // create object of the Promise driven HTTP client and ensure following code works
@@ -33,7 +59,7 @@ let contact = {
   }
 
 httpClient
-.post(record)
+.post(contact)
 .then(response=>{
     alert('record added')
     console.log(response);
@@ -58,4 +84,4 @@ httpClient
     document.write(response);
     console.log(err)
 });
-
+module.exports = http;
